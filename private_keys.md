@@ -43,9 +43,9 @@ _Fields of the key storage V1_
 All fields must be represented in JSON. The JSON will be converted to a string and then be encrypted with AES256.
 
 _Scrypt Params to use for the key storage_
-N = 16384
-r = 8
-p = 1
+- N = 16384
+- r = 8
+- p = 1
 
 
 ## References
