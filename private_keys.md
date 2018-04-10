@@ -25,6 +25,11 @@ The coin seed is generated with the BIP39 seed function. Chose the mnemonic as t
 ### Ethereum Private Key
 The ethereum private key is derived via BIP32 and the `coin seed`.  The derivation path is `m/100H/10H`
 
+_test vector_
+- seed: `000102030405060708090a0b0c0d0e0f`
+- derived private key in bip32 format: `xprv9wcNdJJka9HhTMQ2qEtUeDQQkUUYpfDL4TWcxFNDWyRwC8FuQ9uRutGg31qvMp6LF8AU6RJxHF9nqqsjQoj789Fv1HhMQuFprLjgYFqcG6B`
+- derived raw private key: `82690b8dd8bd9790c809563250a366a6ce17e212a54315eafbd0ac21b825152b`
+
 ### Key Storage
 All the key's will be stored in the normal file system / database of the device. They must be encrypted with AES256. The encryption "password" for AES256 should be derived with Scrypt from a password the user chose. The key storage will only safe the mnemonic and the derived key's. When implementing this, make sure your implementation provideds data integrety for the key's. E.g. when you derived the ethereum private key and safed it to the key store, make sure to derive it again the next time the client is started and compare it with the safed one in order to fail early in case the process of deriving them changed (I just want to notice that the way of derivation is not supposed to change, the comparison of the stored one and derived one is more to be absolutely sure that it's still the same).
 
