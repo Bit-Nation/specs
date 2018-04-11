@@ -1,4 +1,4 @@
-### Definition
+### Definition (WIP)
 Let's call a person that uses the app a _user_.
 
 Usually, to be able to understand which user is using an app (and therefore provide user-specific information) one gives user an ability to create an account. But our concept is a bit different, we allow user to create multiple _accounts_, therefore we don't have _user-specific_ information, but only _account-specific_ one. 
@@ -22,7 +22,16 @@ It's worth noting that password (pin code) protection is completely local and is
 
 ### Password (pin code) requirements
 
-TBD
+_pin codes_
+- must have a lenght of 6 numbers
+
+_password_
+- must be at least 6 char's long
+- white spaces are NOT allowed
+- allowed characters are: 
+  - A-Z
+  - a-z
+  - 0-9
 
 ### Account backup
 
