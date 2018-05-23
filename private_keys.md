@@ -1,24 +1,20 @@
-# Pangea Technical Specification - Key's (WIP)
-> Since we use a LOT of private and public key's we somehow need to be able to organise / handle them. Another important point is maintenance. What happen's if an device get's lost? How do we import private key's? The amount of them is growing over time, as we e.g. add new crypto currencies like bitcoin etc which require there own private key.
+# Pangea Technical Specification - Keys (WIP)
+> Since we use a LOT of private and public keys we somehow need to be able to organise / handle them. Another important point is maintenance. What happens if an device get lost? How do we import private keys? The amount of them is growing over time, as we e.g. add new crypto currencies like bitcoin etc which require there own private key.
 
 ### Mnemonic
 The "mnemonic" is a 24 mnemonic as specified in BIP39. In the context of pangea we are always referencing to a 24 long mnemonic. 24 words are suggested by BIP39. The mnemotic build the "root" key for all pangea private / public key pairs (the ethereum key etc is derived based on the definiton you will find in this document).
 
 ### BIP32 - Hardened key derivation
-> Since BIP32 doesn't specifiy a derivation function (as pseudo code - way's how to derive key's are described) we will have our own one based on BIP32.
+> Since BIP32 doesn't specifiy a derivation function (as pseudo code - ways how to derive keys are described) we will have our own one based on BIP32.
 
 __definition__
 `pow(a, b)` takes `a` to the power of `b`
 
 __Description__
-We use BIP32 to generate wallet private key's based on the `coin seed` (next element). Only hardened key's are used. The derivation path should look like this `m/100H/10H`. `H` indicates that it's a hardned key. E.g. `m/100H/10H` would be the same as `m/100+pow(2, 31)/10+pow(2, 31)`. When a path segement does not contain an `H` the derivation function should exit with and error. The first segment of the path segments MUST be an `m` which indicates we are deriving from the master key.
+We use BIP32 to generate wallet private keys based on the `coin seed` (next element). Only hardened keys are used. The derivation path should look like this `m/100H/10H`. `H` indicates that it's a hardned key. E.g. `m/100H/10H` would be the same as `m/100+pow(2, 31)/10+pow(2, 31)`. When a path segement does not contain an `H` the derivation function should exit with and error. The first segment of the path segments MUST be an `m` which indicates we are deriving from the master key.
 
 ### Coin Seed
 The coin seed is generated with the BIP39 seed function. Chose the mnemonic as the mnemonic and `coins` as the password to derive the seed for the coins.
-
-_test vector_
-- mnemonic: `abandon amount liar amount expire adjust cage candy arch gather drum buyer`
-- seed: `ad765afe783c82c7f3e6bdcb8b93fcd1b07f855fb5761418ba10724b11b72fa36440a7149f8a939aaabc451191be137d197becafc2739c1dfa748b53eb456d27`
 
 ### Signal
 > TBD
@@ -27,15 +23,10 @@ _test vector_
 > TBD
 
 ### Ethereum Private Key
-The ethereum private key is derived via BIP32 and the `coin seed`.  The derivation path is `m/100H/10H`. The derived key is safed as the raw hex key.
-
-_test vector_
-- mnemonic: `abandon amount liar amount expire adjust cage candy arch gather drum buyer`
-- seed: `ad765afe783c82c7f3e6bdcb8b93fcd1b07f855fb5761418ba10724b11b72fa36440a7149f8a939aaabc451191be137d197becafc2739c1dfa748b53eb456d27`
-- derived raw private key: `dedbc9eb2b7eea18727f4b2e2d440b93e597cb283f00a3245943481785944d75`
+The ethereum private key is derived via BIP32 and the coin seed.  The derivation path is `m/100H/10H`. The derived key is safed as the raw hex key.
 
 ### Key Storage
-All the key's will be stored in the normal file system / database of the device. They must be encrypted with AES256. The encryption "password" for AES256 should be derived with Scrypt from a password the user chose. The key storage will only safe the mnemonic and the derived key's. When implementing this, make sure your implementation provideds data integrety for the key's. E.g. when you derived the ethereum private key and safed it to the key store, make sure to derive it again the next time the client is started and compare it with the safed one in order to fail early in case the process of deriving them changed (I just want to notice that the way of derivation is not supposed to change, the comparison of the stored one and derived one is more to be absolutely sure that it's still the same).
+All the keys will be stored in the normal file system / database of the device. They must be encrypted with AES256. The encryption "password" for AES256 should be derived with Scrypt from a password the user chose. The key storage will only safe the mnemonic and the derived keys. When implementing this, make sure your implementation provideds data integrety for the keys. E.g. when you derived the ethereum private key and safed it to the key store, make sure to derive it again the next time the client is started and compare it with the safed one in order to fail early in case the process of deriving them changed (I just want to notice that the way of derivation is not supposed to change, the comparison of the stored one and derived one is more to be absolutely sure that it's still the same).
 
 _Fields of the key storage V1_
 ```
@@ -62,5 +53,5 @@ _Scrypt Params to use for the key storage_
 - [BIP32](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki)
 
 ## Notes
-- We only use hardned key's (see bip39) since they are more secure.
-- When using the BIP39 seed function it's common pratice to use different passwords to generate different seed's with the same mnemonic. So same menemotic but different passwords. However, the reason why we use the seed function is, to generate deterministic cryptographic secure byte arrays. All "password's" (e.g `coins`) are public and specified. BUT the mnemonic is still unknown so security is given.
+- We only use hardned keys (see bip39) since they are more secure.
+- When using the BIP39 seed function it's common pratice to use different passwords to generate different seeds with the same mnemonic. So same menemotic but different passwords. However, the reason why we use the seed function is, to generate deterministic cryptographic secure byte arrays. All "passwords" (e.g `coins`) are public and specified. BUT the mnemonic is still unknown so security is given.
