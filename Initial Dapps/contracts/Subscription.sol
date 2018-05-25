@@ -3,13 +3,25 @@ import "./Ownable.sol";
 
 contract Subscription is Ownable {
 
+    struct Funder {
+        address addr;
+        uint amount;
+    }
+
+    struct SubscriptionModel {
+        uint numCollected;
+        uint subscriptionStart;
+        address buyer;
+        uint remainingFunds;
+    }
+
+    bool public cancellable;
     uint public unitPrice;
     uint public numPayments;
-    uint public numCollected;
-    bool public cancellable;
-    uint public subscriptionStart;
     uint public unitTime;
-    address public buyer;
+
+    mapping (address => Subscription) subscribers;
+    address[] subscriberAddresses;
 
     event SubscriptionCharged(uint amount, address buyer);
     event SubscriptionStarted(uint totalAmount, uint numPayments, bool cancellable, address buyer);
@@ -24,9 +36,13 @@ contract Subscription is Ownable {
 
     function buySubscription() public payable {
         require(msg.value == unitPrice * numPayments);
-        require(subscriptionStart == 0);
-        subscriptionStart = now;
-        buyer = msg.sender;
+        require(subscribers[msg.sender].subscriptionStart == 0);
+        SubscriptionModel storage newSub = subscribers[msg.sender];
+        newSub.subscriptionStart = now;
+        newSub.buyer = msg.sender;
+        newSub.remainingFunds = msg.value;
+
+        subscriberAddresses.push(msg.sender);
 
         emit SubscriptionStarted(unitPrice * numPayments, numPayments, cancellable, buyer);
     }
@@ -36,19 +52,36 @@ contract Subscription is Ownable {
         require(numCollected < numPayments);
         require(now >= subscriptionStart + (unitTime * numCollected));
 
-        numCollected++;
+        for (uint i=0; i<subscriberAddresses.length; i++) {
+            SubscriptionModel storage sub = subscribers[subscriberAddresses[i]];
+            if ((sub.subscriptionStart != 0) && (now >= sub.subscriptionStart + (unitTime * sub.numCollected)) && (sub.numCollected < numPayments)) {
+                sub.numCollected++;
+                sub.remainingFunds -= unitPrice;
+                owner.transfer(unitPrice);
+                emit SubscriptionCharged(unitPrice, sub.buyer);
+            }
+        }
 
-        owner.transfer(unitPrice);
-
-        emit SubscriptionCharged(unitPrice, buyer);
 
     }
 
     function cancelSubscription() public {
-        require(msg.sender == buyer);
+        SubscriptionModel storage sub = subscribers[msg.sender];
+        require(msg.sender == sub.buyer);
         require(cancellable);
 
-        buyer.transfer(address(this).balance);
+        // TODO: fix remaining balance
+        sub.remainingBalance = 0;
+        sub.buyer.transfer(sub.remainingBalance);
+
+        delete subscribers[msg.sender];
+    }
+
+    function checkSubscription(address _buyer) public constant returns (uint _remainingFunds, uint _numCollected, uint _subscriptionStart) {
+        SubscriptionModel memory sub = subscribers[msg.sender];
+        _remainingFunds = sub.remainingFunds;
+        _numCollected = sub.numCollected;
+        _subscriptionStart = sub.subscriptionStart;
     }
 
 }

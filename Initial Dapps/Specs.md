@@ -30,3 +30,19 @@ Call will fail if there is not enough ether sent.
 
 `checkCustomer(address customer)`: Callable by passing the ethereum address of the customer being checked. This will return an uint of the number of times
 this customer has purchased this item.
+
+## Subscription
+The subscription contract is initialized with the following parameters:
+1. `unitPrice`: How much does the subscription cost per charge? (eg. 1 ETH per month)
+2. `numPayments`: How many payments does the subscription constitute?
+3. `cancellable`: Is the subscription cancellable?
+4. `unitTime`: How often is the subscription charged in seconds? (eg. 2629746 for monthly charge)
+
+The contract exposes 3 functions.
+`buySubscription()`: Callable without any parameters, and must be sent from the buyer with the full amount required for the subscription.
+Eg. If the subscription costs 1 ETH for 12 months, 12 ETH must be sent with the call.
+
+`collectSubscription()`: Callable without any parameters from the owner. Collects all the available subscriptions
+
+`cancelSubscription()`: Callable without any parameters from a subscription buyer. Requires subscription to be cancellable. Refunds all remaining 
+funds in that subscription back to the buyer.
