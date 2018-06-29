@@ -20,7 +20,7 @@ contract Subscription is Ownable {
     uint public numPayments;
     uint public unitTime;
 
-    mapping (address => Subscription) subscribers;
+    mapping (address => SubscriptionModel) subscribers;
     address[] subscriberAddresses;
 
     event SubscriptionCharged(uint amount, address buyer);
@@ -44,13 +44,10 @@ contract Subscription is Ownable {
 
         subscriberAddresses.push(msg.sender);
 
-        emit SubscriptionStarted(unitPrice * numPayments, numPayments, cancellable, buyer);
+        emit SubscriptionStarted(unitPrice * numPayments, numPayments, cancellable, newSub.buyer);
     }
 
     function collectSubscription() public onlyOwner {
-        require(subscriptionStart != 0);
-        require(numCollected < numPayments);
-        require(now >= subscriptionStart + (unitTime * numCollected));
 
         for (uint i=0; i<subscriberAddresses.length; i++) {
             SubscriptionModel storage sub = subscribers[subscriberAddresses[i]];
@@ -71,8 +68,8 @@ contract Subscription is Ownable {
         require(cancellable);
 
         // TODO: fix remaining balance
-        sub.remainingBalance = 0;
-        sub.buyer.transfer(sub.remainingBalance);
+//        sub.remainingBalance = 0;
+//        sub.buyer.transfer(sub.remainingBalance);
 
         delete subscribers[msg.sender];
     }

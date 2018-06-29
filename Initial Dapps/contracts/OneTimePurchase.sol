@@ -8,6 +8,8 @@ contract OneTimePurchase {
     address public seller;
     mapping (address => uint) public customers;
 
+    event ItemPurchased(address indexed customer);
+
     constructor(uint _price, string _description, address _seller) public {
         price = _price;
         description = _description;
@@ -22,6 +24,7 @@ contract OneTimePurchase {
         require(msg.value == price);
         customers[msg.sender] += 1;
         numPurchased += 1;
+        emit ItemPurchased(msg.sender);
     }
 
     function withdraw() public {
